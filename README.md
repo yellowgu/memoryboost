@@ -76,6 +76,13 @@ powershell -ExecutionPolicy Bypass -File scripts/sync-project-agents.ps1
 
 （配套教程持续更新，链接见后续 release）
 
+## 联系
+
+memoryboost 属于 forge-ai 开源系列。forge-ai 也承接 AI 商业应用定制开发——生意痛点 → AI 软件，几周落地。
+
+- 邮箱：yellowgu@163.com
+- 微信：17015815（请注明来意）
+
 ## 许可与作者
 
 MIT License © 2026 forge-ai · 作者：yellowgu
