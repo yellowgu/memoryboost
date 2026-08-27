@@ -1,8 +1,23 @@
 # memoryboost
 
 > 一套**零依赖**的 AI Agent 记忆架构：让 Claude Code / Cursor / Codex / Gemini CLI 记住你的每一个项目——跨会话、跨工具、跨机器。纯 Markdown + 一条同步脚本，git 即备份。
+>
+> A **zero-dependency** memory architecture for AI agents — remember every project across sessions, tools, and machines. Pure Markdown + one sync script; git is your backup.
 
-**forge-ai 系列开源项目** · 作者：yellowgu · MIT License
+**forge-ai 系列开源项目 · forge-ai open-source series** · 作者 Author：yellowgu · MIT License
+
+## English (brief)
+
+memoryboost is a three-layer, file-based memory architecture for AI coding agents:
+
+- **Global library** (single source of truth) → **project profiles** → **handoff notes**
+- **Zero dependencies**: pure Markdown + one PowerShell sync script, no database, no MCP server
+- **Cross-tool**: works with Claude Code, Cursor, Codex, Gemini CLI
+- **Git as backup**: your memory library is just a git repo — versioned, portable, team-shareable
+
+**Quick start**: copy `templates/` and `scripts/` into your own memory library, fill in the templates, then run `scripts/sync-project-agents.ps1`. Full documentation below (in Chinese).
+
+**Contact**: forge-ai also builds custom AI business applications. Email: yellowgu@163.com · WeChat: 17015815 (please state your purpose)
 
 ## 为什么需要它
 
