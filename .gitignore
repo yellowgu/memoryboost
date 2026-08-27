@@ -1,0 +1,11 @@
+# AI 工具自动记忆目录（不提交）
+.claude/
+.cursor/
+.codex/
+.windsurf/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+node_modules/
+*.local
