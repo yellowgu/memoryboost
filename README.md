@@ -29,6 +29,20 @@ AI 编程工具的自动记忆通常按项目目录隔离：项目 A 里踩过�
 
 ## 架构图
 
+```mermaid
+flowchart LR
+  A[总库 AGENTS.md 唯一事实源] --> B[projects/ 项目档案]
+  A --> C[topics/ 决策与打法]
+  A --> D[templates/ 模板]
+  B -- sync-project-agents.ps1 --> E[各项目根 AGENTS.md]
+  B -- sync-project-agents.ps1 --> F[各项目根 CLAUDE.md 桥接]
+  E --> G[各 harness 会话]
+  F --> G
+```
+
+<details>
+<summary>纯文本版架构图（渲染环境不支持 mermaid 时展开查看）</summary>
+
 ```
 ┌─ 总库（唯一事实源 · 一个 git 仓库）────────────────────┐
 │ AGENTS.md      身份 / 偏好 / 铁律 / 项目索引            │
@@ -48,6 +62,8 @@ AI 编程工具的自动记忆通常按项目目录隔离：项目 A 里踩过�
    Claude Code · Cursor · Codex · Gemini CLI
    DeepSeek Harness(dsh) · TRAE CLI · CodeBuddy Code
 ```
+
+</details>
 
 ## 快速开始（5 分钟）
 
