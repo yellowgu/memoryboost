@@ -12,7 +12,7 @@ memoryboost is a three-layer, file-based memory architecture for AI coding agent
 
 - **Global library** (single source of truth) → **project profiles** → **handoff notes**
 - **Zero dependencies**: pure Markdown + one PowerShell sync script, no database, no MCP server
-- **Cross-tool**: works with Claude Code, Cursor, Codex, Gemini CLI
+- **Cross-tool**: works with Claude Code, Cursor, Codex, Gemini CLI, DeepSeek Harness (dsh), TRAE CLI, CodeBuddy Code
 - **Git as backup**: your memory library is just a git repo — versioned, portable, team-shareable
 
 **Quick start**: copy `templates/` and `scripts/` into your own memory library, fill in the templates, then run `scripts/sync-project-agents.ps1`. Full documentation below (in Chinese).
@@ -29,14 +29,24 @@ AI 编程工具的自动记忆通常按项目目录隔离：项目 A 里踩过�
 
 ## 架构图
 
-```mermaid
-flowchart LR
-  A[总库 AGENTS.md<br/>唯一事实源] --> B[projects/ 项目档案]
-  A --> C[topics/ 决策与打法]
-  A --> D[templates/ 模板]
-  B -- sync-project-agents.ps1 --> E[各项目根 AGENTS.md]
-  B -- sync-project-agents.ps1 --> F[各项目根 CLAUDE.md 桥接]
-  E --> G[Claude Code / Cursor / Codex 会话]
+```
+┌─ 总库（唯一事实源 · 一个 git 仓库）────────────────────┐
+│ AGENTS.md      身份 / 偏好 / 铁律 / 项目索引            │
+│ projects/*.md  项目档案（每项目一页纸）                 │
+│ topics/*.md    跨项目决策与可复用打法                   │
+│ templates/*.md 模板（档案 / 交接单 / spec）            │
+│ scripts/sync-project-agents.ps1  同步脚本              │
+└───────────────────────────┬───────────────────────────┘
+                            │ 按 sync-map.json 映射同步
+                            ▼
+              ┌──────────────────────────┐
+              │ 项目根 AGENTS.md（档案副本）│
+              │ 项目根 CLAUDE.md（@桥接）   │
+              └────────────┬─────────────┘
+                           │ 各工具原生读取
+                           ▼
+   Claude Code · Cursor · Codex · Gemini CLI
+   DeepSeek Harness(dsh) · TRAE CLI · CodeBuddy Code
 ```
 
 ## 快速开始（5 分钟）
@@ -65,10 +75,20 @@ powershell -ExecutionPolicy Bypass -File scripts/sync-project-agents.ps1
 | | 说明 |
 |---|---|
 | 零依赖 | 纯 Markdown + 一个 PowerShell 脚本，无数据库、无 MCP server、无 npm 包 |
-| 跨工具 | AGENTS.md 是主流工具（Cursor/Codex/Gemini CLI/Claude Code）共同认可的标准文件 |
+| 跨工具 | AGENTS.md 是主流 harness（Claude Code/Cursor/Codex/Gemini CLI/DeepSeek Harness/TRAE CLI 等）共同认可的标准文件，见下方支持表 |
 | git 即备份 | 记忆库就是一个 git 仓库：版本历史、跨机器同步、团队共享，天然免费 |
 | 可迁移 | 换工具/换模型，拷个文件夹就走，不绑定任何厂商 |
 | 方法论内置 | 附赠三角色协作制度（策划/验收/执行）+ spec 模板 + 交接单制度 |
+
+## 支持的 Harness（2026-08 验证）
+
+| Harness | AGENTS.md 支持 | 说明 |
+|---|---|---|
+| Claude Code | ✅ 原生（经 CLAUDE.md `@` 桥接） | 本项目原生设计目标 |
+| Cursor / Codex / Gemini CLI | ✅ 原生 | AGENTS.md 为标准共识文件 |
+| DeepSeek Harness（dsh） | ✅ 原生 | DeepSeek 官方 harness；`~/.dsh/AGENTS.md` 全局 + 项目链 |
+| TRAE CLI（字节/豆包） | ✅ 原生 | 当前及上级目录恒载，支持 `@file.md` 引用；中文版历史版本需确认开关 |
+| CodeBuddy Code（腾讯 WorkBuddy） | ⚠️ 兼容 | 官方主推 CODEBUDDY.md，AGENTS.md 仅在项目无 CODEBUDDY.md 时生效；可将项目根 AGENTS.md 另存为 CODEBUDDY.md 使用（同步脚本后续版本计划支持输出，欢迎 PR） |
 
 ## 竞品对比（诚实版）
 
