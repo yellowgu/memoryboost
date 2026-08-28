@@ -27,7 +27,10 @@ $count = 0
 
 foreach ($prop in $map.psobject.Properties) {
   $dossier = Join-Path (Join-Path $mapDir 'projects') $prop.Name
-  $destDir = [System.IO.Path]::GetFullPath((Join-Path $mapDir $prop.Value))
+  # absolute paths are used verbatim; relative paths resolve against the map file dir
+  $destDir = $prop.Value
+  if (-not [System.IO.Path]::IsPathRooted($destDir)) { $destDir = Join-Path $mapDir $destDir }
+  $destDir = [System.IO.Path]::GetFullPath($destDir)
   if (-not (Test-Path -Path $dossier)) { Write-Host "SKIP dossier missing: $dossier"; continue }
   if (-not (Test-Path -Path $destDir)) { Write-Host "SKIP project dir missing: $destDir"; continue }
 
