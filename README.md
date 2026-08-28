@@ -65,6 +65,19 @@ flowchart LR
 
 </details>
 
+## 一条命令部署（最快 · 不需要任何 coding agent）
+
+现场装、发给学员、远程装机都适用。把下面这条命令发给对方，在 PowerShell 粘贴回车——自动完成：下载模板 → 建记忆库 → 生成全局记忆 → （可选）为当前目录建档 → 首次同步。全程只问 2-3 个问题：
+
+```powershell
+irm https://gitee.com/yellowgu/memoryboost/raw/main/scripts/deploy.ps1 -OutFile deploy.ps1; .\deploy.ps1
+```
+
+- 无需安装 git（没装 git 也能用，只是少一层版本备份）
+- 可重入：重跑自动跳过已完成步骤，不覆盖你已填写的档案
+- 无人值守（远程装机）：`$env:MB_LIB_DIR='D:\memory'; $env:MB_USER_ID='你的代号'; .\deploy.ps1`
+- 装完按屏幕提示编辑 `AGENTS.md` 补齐偏好；各工具接入方法见下节
+
 ## 一句话部署（推荐 · 让 Agent 自己装）
 
 在 Claude Code / Cursor / Codex / DeepSeek Harness (dsh) / CodeBuddy 里**新开一个会话**，把下面对应提示词整段粘贴、回车。Agent 会问你几个问题（身份、偏好、项目背景），然后自动完成：建库 → 拷模板 → 建档 → 同步 → 接入本工具。
