@@ -15,7 +15,7 @@ memoryboost is a three-layer, file-based memory architecture for AI coding agent
 - **Cross-tool**: works with Claude Code, Cursor, Codex, Gemini CLI, DeepSeek Harness (dsh), TRAE CLI, CodeBuddy Code
 - **Git as backup**: your memory library is just a git repo — versioned, portable, team-shareable
 
-**Quick start**: copy `templates/` and `scripts/` into your own private memory library, fill in the templates, run `scripts/sync-project-agents.ps1`, then wire up your tool (step 5: Claude Code / Cursor / dsh / …). Full step-by-step guide below (in Chinese).
+**Quick start**: paste the one-prompt deploy snippet (一句话部署) into your Claude Code / Cursor / dsh session — the agent builds the library and wires itself up. Or do it manually: copy `templates/` and `scripts/` into your own private memory library, fill in the templates, run `scripts/sync-project-agents.ps1`. Full step-by-step guide below (in Chinese).
 
 **Contact**: forge-ai also builds custom AI business applications. Email: yellowgu@163.com · WeChat: 17015815 (please state your purpose)
 
@@ -65,7 +65,35 @@ flowchart LR
 
 </details>
 
-## 快速开始（部署到你的 Coding Agent，6 步）
+## 一句话部署（推荐 · 让 Agent 自己装）
+
+在 Claude Code / Cursor / Codex / DeepSeek Harness (dsh) / CodeBuddy 里**新开一个会话**，把下面对应提示词整段粘贴、回车。Agent 会问你几个问题（身份、偏好、项目背景），然后自动完成：建库 → 拷模板 → 建档 → 同步 → 接入本工具。
+
+**交互式工具（Claude Code / Cursor / CodeBuddy Code）用这段：**
+
+```text
+请帮我部署 memoryboost 记忆架构（仓库 https://gitee.com/yellowgu/memoryboost ，按该仓库 README 操作）：
+1. 建私有记忆库：mkdir D:\memory 并 git init（若该路径已存在或被占用，先问我）
+2. git clone https://gitee.com/yellowgu/memoryboost D:\memoryboost-src ，把其中 templates\ 与 scripts\ 复制进 D:\memory ，再删除 D:\memoryboost-src
+3. 用 templates\AGENTS.template.md 生成 D:\memory\AGENTS.md ：身份/技术偏好/协作原则/禁止事项逐项问我，未经我确认不得编造任何内容
+4. 用 templates\project.template.md 为当前项目生成 projects\<项目名>.md ：定位/技术栈/关键决策逐项问我
+5. 在 D:\memory 写 sync-map.json ：{ "<项目名>.md": "<当前项目绝对路径>" }
+6. 运行 powershell -ExecutionPolicy Bypass -File D:\memory\scripts\sync-project-agents.ps1 -DryRun ，确认无误后去掉 -DryRun 正式运行
+7. 接入本工具：Claude Code 需确认项目根 CLAUDE.md 含 @AGENTS.md 并在 %USERPROFILE%\.claude\CLAUDE.md 加一行 @D:/memory/AGENTS.md ；Cursor/Codex/Gemini/TRAE 确认项目根 AGENTS.md 已生成即可；CodeBuddy 把项目根 AGENTS.md 复制为 CODEBUDDY.md
+8. 报告完成结果，并告诉我之后新会话如何验证生效
+```
+
+**一次性/无头模式（dsh `--profile headless`、Codex `-p`）用这段：**
+
+```text
+按 https://gitee.com/yellowgu/memoryboost 的 README 部署 memoryboost：在 D:\memory 建库并 git init；clone 仓库拷贝 templates\ 与 scripts\ 后删除源目录；用模板生成 AGENTS.md 与 projects\first-project.md（身份等用占位符，稍后我手工填）；写 sync-map.json 映射当前目录；运行 sync-project-agents.ps1 同步；dsh 环境再把 D:\memory\AGENTS.md 复制到 $HOME\.dsh\AGENTS.md 。全部完成后打印创建/修改的每个文件路径。
+```
+
+（无头模式没有问答，身份与偏好先用占位符生成，之后自己编辑 `D:\memory\AGENTS.md` 即可。）
+
+**部署完怎么验证**：新开一个会话，问"当前项目的定位是什么？"能答出档案内容 = 成功。答不出 → 让 Agent 重跑第 7 步，或回退到下方手动 6 步。
+
+## 快速开始（手动 · 6 步）
 
 **总流程**：建记忆库 → 填全局记忆 → 建项目档案 → 跑同步脚本 → 接入你的工具 → 验证生效。
 
