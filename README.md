@@ -15,7 +15,7 @@ memoryboost is a three-layer, file-based memory architecture for AI coding agent
 - **Cross-tool**: works with Claude Code, Cursor, Codex, Gemini CLI, DeepSeek Harness (dsh), TRAE CLI, CodeBuddy Code
 - **Git as backup**: your memory library is just a git repo — versioned, portable, team-shareable
 
-**Quick start**: copy `templates/` and `scripts/` into your own memory library, fill in the templates, then run `scripts/sync-project-agents.ps1`. Full documentation below (in Chinese).
+**Quick start**: copy `templates/` and `scripts/` into your own private memory library, fill in the templates, run `scripts/sync-project-agents.ps1`, then wire up your tool (step 5: Claude Code / Cursor / dsh / …). Full step-by-step guide below (in Chinese).
 
 **Contact**: forge-ai also builds custom AI business applications. Email: yellowgu@163.com · WeChat: 17015815 (please state your purpose)
 
@@ -65,26 +65,77 @@ flowchart LR
 
 </details>
 
-## 快速开始（5 分钟）
+## 快速开始（部署到你的 Coding Agent，6 步）
+
+**总流程**：建记忆库 → 填全局记忆 → 建项目档案 → 跑同步脚本 → 接入你的工具 → 验证生效。
+
+### 第 1 步：建立你自己的记忆库
+
+你的记忆库是**私有资产**（含身份、偏好、项目内幕），必须放在你自己的私有 git 仓库，只把本仓库的 `templates/` 与 `scripts/` 拷过去：
 
 ```powershell
-# 1. 克隆本仓库，或直接把 templates/ 与 scripts/ 拷进你自己的记忆库
-git clone <你的仓库地址> memory
-cd memory
+# 1.1 建库并初始化 git
+mkdir D:\memory
+cd D:\memory
+git init
 
-# 2. 按 templates/AGENTS.template.md 填写你的全局记忆（身份/偏好/铁律）
-
-# 3. 复制 templates/project.template.md 为 projects/<项目>.md 填写
-
-# 4. 编辑 sync-map.json，声明档案到项目根目录的映射
-#    {"my-project.md": "D:/code/my-project"}
-
-# 5. 干跑验证，再正式同步
-powershell -ExecutionPolicy Bypass -File scripts/sync-project-agents.ps1 -DryRun
-powershell -ExecutionPolicy Bypass -File scripts/sync-project-agents.ps1
+# 1.2 从本仓库拿模板与脚本（临时 clone 到别处，拷完即删）
+git clone https://gitee.com/yellowgu/memoryboost D:\memoryboost-src
+Copy-Item D:\memoryboost-src\templates,D:\memoryboost-src\scripts -Destination D:\memory -Recurse
+Remove-Item D:\memoryboost-src -Recurse -Force
 ```
 
-同步后，每个项目根得到 `AGENTS.md`（权威档案副本，Cursor/Codex/Gemini 原生读取）与 `CLAUDE.md`（一行 `@AGENTS.md` 桥接，Claude Code 经它读取）。
+> 只想快速体验？直接 clone 本仓库，跳过第 1-2 步，用 `examples/sync-map.json` 跑第 4 步即可（`demo-shop.md` 是虚构示例项目）。
+
+### 第 2 步：填全局记忆 AGENTS.md
+
+```powershell
+Copy-Item templates\AGENTS.template.md AGENTS.md
+# 打开 AGENTS.md 填写：身份 / 技术偏好 / 协作原则 / 禁止事项 / 项目索引
+```
+
+### 第 3 步：建项目档案 + 声明映射
+
+```powershell
+Copy-Item templates\project.template.md projects\<项目名>.md
+# 填写档案后，在记忆库根目录新建 sync-map.json：
+# { "<项目名>.md": "D:/code/<你的项目目录>" }
+```
+
+### 第 4 步：跑同步脚本
+
+```powershell
+# 先干跑看效果，再正式同步
+powershell -ExecutionPolicy Bypass -File scripts\sync-project-agents.ps1 -DryRun
+powershell -ExecutionPolicy Bypass -File scripts\sync-project-agents.ps1
+```
+
+同步后每个项目根得到 `AGENTS.md`（档案副本）与 `CLAUDE.md`（一行 `@AGENTS.md` 桥接；已存在的 CLAUDE.md 绝不覆盖）。
+
+### 第 5 步：接入你的 Coding Agent
+
+| 工具 | 需要你做的事 |
+|---|---|
+| **Claude Code** | ① 项目根 `CLAUDE.md` 已由第 4 步生成，自动生效；② 全局记忆：在 `%USERPROFILE%\.claude\CLAUDE.md`（无此文件则新建）加一行 `@D:/memory/AGENTS.md` |
+| **Cursor / Codex / Gemini CLI / TRAE CLI** | 无需操作——项目根 `AGENTS.md` 原生自动读取 |
+| **DeepSeek Harness (dsh)** | 把总库入口复制到用户目录：`Copy-Item D:\memory\AGENTS.md $HOME\.dsh\AGENTS.md` |
+| **CodeBuddy Code** | 官方主推 CODEBUDDY.md：在项目根执行 `Copy-Item AGENTS.md CODEBUDDY.md` |
+
+### 第 6 步：验证生效
+
+在对应工具**新开一个会话**，问：
+
+```
+这个项目的定位是什么？最近的关键决策有哪些？
+```
+
+能答出档案内容 = 部署成功。答不出 → 检查第 5 步的文件位置与内容，再新开会话重试（已开的会话不会重新加载）。
+
+### 日常维护（每次 30 秒）
+
+- 档案更新后重跑一次同步脚本；新项目建档 = 复制模板 → `sync-map.json` 加一行 → 重跑
+- 多会话协作：项目根 `HANDOFF.md` 开始先读、结束前更新（模板：`templates/HANDOFF.template.md`）
+- 想进一步定制（spec 流程、三角色协作制度）→ 见 [docs/architecture.md](docs/architecture.md)
 
 ## 特性
 
